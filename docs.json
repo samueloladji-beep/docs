@@ -1,12 +1,15 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "Vaultak",
-  "theme": "mint",
+  "theme": "sequoia",
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#00FF88",
-    "light": "#00FF88",
-    "dark": "#00FF88"
+    "primary": "#ffffff",
+    "light": "#ffffff",
+    "dark": "#0a0a0a"
+  },
+  "appearance": {
+    "default": "dark"
   },
   "topbarLinks": [
     {
@@ -31,6 +34,6 @@
     ]
   },
   "footerSocials": {
-    "github": "https://github.com/samueloladji-beep/Vaultak"
+    "github": "https://github.com/samueloladji-beep/vaultak"
   }
 }
