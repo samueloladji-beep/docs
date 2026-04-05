@@ -1,9 +1,5 @@
 {
   "name": "Vaultak",
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
   "favicon": "/favicon.svg",
   "colors": {
     "primary": "#00FF88",
