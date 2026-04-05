@@ -1,0 +1,88 @@
+---
+title: SDK Reference
+description: Complete Vaultak SDK documentation
+---
+
+## Installation
+```bash
+pip install vaultak
+```
+
+## Vaultak Class
+
+The main class for governing agent behavior.
+```python
+from vaultak import Vaultak
+from vaultak.models import AgentConfig, KillSwitchMode
+
+breaker = Vaultak(AgentConfig(
+    agent_id="my-agent",
+    kill_switch_mode=KillSwitchMode.PAUSE,
+    risk_threshold=0.7
+))
+```
+
+### AgentConfig Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `agent_id` | str | required | Unique identifier for your agent |
+| `kill_switch_mode` | KillSwitchMode | ALERT | Response mode when risk threshold is exceeded |
+| `risk_threshold` | float | 0.7 | Score from 0-1 that triggers the response |
+| `baseline_window` | int | 50 | Number of actions used to learn normal behavior |
+| `rollback_limit` | int | 5 | Max number of actions to reverse in ROLLBACK mode |
+
+## breaker.watch()
+
+Context manager that monitors a single agent action.
+```python
+with breaker.watch(action_type, resource, payload, rollback_fn):
+    # your action here
+```
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `action_type` | str | Yes | Type of action (file_write, api_call, etc.) |
+| `resource` | str | Yes | Resource being acted upon |
+| `payload` | dict | No | Action data for risk scoring |
+| `rollback_fn` | callable | No | Function to call if ROLLBACK is triggered |
+
+### Action Types
+
+| Action | Description |
+|--------|-------------|
+| `file_read` | Reading a file |
+| `file_write` | Writing to a file |
+| `file_delete` | Deleting a file |
+| `api_call` | External API request |
+| `database_query` | Reading from database |
+| `database_write` | Writing to database |
+| `code_execution` | Executing code |
+| `network_request` | Network communication |
+
+## KillSwitchMode
+```python
+from vaultak.models import KillSwitchMode
+
+KillSwitchMode.ALERT     # Log and notify only
+KillSwitchMode.PAUSE     # Halt agent, await approval
+KillSwitchMode.ROLLBACK  # Reverse actions and pause
+```
+
+## breaker.approve()
+
+Resume a paused agent after human review.
+```python
+breaker.approve()
+```
+
+## breaker.audit_trail()
+
+Returns the full log of all monitored actions.
+```python
+trail = breaker.audit_trail()
+for action in trail:
+    print(action.action_type, action.risk_score, action.flagged)
+```
