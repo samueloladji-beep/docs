@@ -25,15 +25,24 @@
     "groups": [
       {
         "group": "Getting Started",
-        "pages": ["index", "quickstart"]
+        "pages": [
+          "index",
+          "quickstart"
+        ]
       },
       {
         "group": "SDK Reference",
-        "pages": ["api-reference"]
+        "pages": [
+          "api-reference"
+        ]
       }
     ]
   },
   "footerSocials": {
     "github": "https://github.com/samueloladji-beep/vaultak"
+  },
+  "logo": {
+    "light": "/favicon.svg",
+    "dark": "/favicon.svg"
   }
 }
