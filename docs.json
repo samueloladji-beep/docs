@@ -42,7 +42,7 @@
     "github": "https://github.com/samueloladji-beep/vaultak"
   },
   "logo": {
-    "light": "/favicon.svg",
-    "dark": "/favicon.svg"
+    "light": "/logo-light.svg",
+    "dark": "/logo.svg"
   }
 }
