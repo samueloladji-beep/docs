@@ -3,57 +3,67 @@ title: Quickstart
 description: Add runtime security to your AI agent in 5 minutes
 ---
 
-## Install
+## 1. Install the SDK
 ```bash
 pip install vaultak
 ```
 
-## Basic Setup
+## 2. Get your API key
+
+Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is shown once on the onboarding screen — save it.
+
+## 3. Wrap your agent
 ```python
 from vaultak import Vaultak
-from vaultak.models import AgentConfig, KillSwitchMode
 
-# Configure once per agent
-breaker = Vaultak(AgentConfig(
-    agent_id="my-agent",
-    kill_switch_mode=KillSwitchMode.PAUSE
-))
+vt = Vaultak(api_key="vtk_your_api_key_here")
+
+with vt.monitor("my-agent"):
+    # your agent code here
+    pass
 ```
 
-## Wrap Agent Actions
-```python
-# Wrap any action your agent takes
-with breaker.watch("file_write", "/etc/config", {"content": data}):
-    # Your agent's action happens here
-    write_file("/etc/config", data)
-```
-
-That's it. Every action is now monitored, risk-scored, and governed in real time.
+That's it. Every action your agent takes is now monitored, risk-scored, and logged in real time on your dashboard.
 
 ## Response Modes
 
 | Mode | What happens |
 |------|-------------|
-| `ALERT` | Logs and notifies. Agent keeps running. |
+| `ALERT` | Logs and notifies. Agent keeps running. Default. |
 | `PAUSE` | Agent halts. Awaits human approval. |
 | `ROLLBACK` | Reverses last N actions. Agent pauses. |
 
-## Works With Any Framework
+## Pre-execution checks
+```python
+import requests
+
+response = requests.post("https://vaultak.com/api/check",
+    headers={"x-api-key": "vtk_your_api_key_here"},
+    json={
+        "agent_id": "my-agent",
+        "action_type": "file_delete",
+        "resource": "/data/sensitive.csv"
+    }
+)
+
+result = response.json()
+if result["allowed"]:
+    delete_file("/data/sensitive.csv")
+else:
+    print(f"Blocked: {result['reason']}")
+```
+
+## Works with any framework
 ```python
 # LangChain
-with breaker.watch("api_call", "openai.chat", payload):
+with vt.monitor("langchain-agent"):
     response = llm.invoke(prompt)
 
 # CrewAI
-with breaker.watch("database_write", "users_table", payload):
+with vt.monitor("crew-agent"):
     crew.kickoff()
 
 # Custom agents
-with breaker.watch("file_delete", "/data/sensitive", payload):
+with vt.monitor("my-agent"):
     agent.run()
 ```
-
-## Next Steps
-
-- Read the [SDK Reference](/api-reference) for full documentation
-- Visit [vaultak.com](https://vaultak.com) to join the early access program
