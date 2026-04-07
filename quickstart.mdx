@@ -4,66 +4,92 @@ description: Add runtime security to your AI agent in 5 minutes
 ---
 
 ## 1. Install the SDK
-```bash
-pip install vaultak
-```
+
+    pip install vaultak
 
 ## 2. Get your API key
 
 Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is shown once on the onboarding screen — save it.
 
 ## 3. Wrap your agent
-```python
-from vaultak import Vaultak
 
-vt = Vaultak(api_key="vtk_your_api_key_here")
+    from vaultak import Vaultak
 
-with vt.monitor("my-agent"):
-    # your agent code here
-    pass
-```
+    vt = Vaultak(api_key="vtk_your_api_key_here")
+
+    with vt.monitor("my-agent"):
+        # your agent code here
+        pass
 
 That's it. Every action your agent takes is now monitored, risk-scored, and logged in real time on your dashboard.
+
+## 4. Define what your agent is allowed to do (optional but recommended)
+
+    from vaultak import Vaultak, ActionType, KillSwitchMode
+
+    vt = Vaultak(
+        api_key="vtk_your_api_key_here",
+        allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
+        allowed_resources=["/tmp/*", "/data/readonly/*"],
+        blocked_resources=["prod.*", "*.env"],
+        max_actions_per_minute=20,
+        max_risk_score=0.7,
+        mode=KillSwitchMode.PAUSE
+    )
+
+    with vt.monitor("my-agent"):
+        agent.run()
+
+Any action outside those boundaries is blocked before it executes.
 
 ## Response Modes
 
 | Mode | What happens |
 |------|-------------|
-| `ALERT` | Logs and notifies. Agent keeps running. Default. |
-| `PAUSE` | Agent halts. Awaits human approval. |
-| `ROLLBACK` | Reverses last N actions. Agent pauses. |
+| ALERT | Logs and notifies. Agent keeps running. Default. |
+| PAUSE | Agent halts. Awaits human approval. |
+| ROLLBACK | Reverses last N actions. Agent pauses. |
+
+## Permission Profile Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| allowed_action_types | list | Only these action types are permitted |
+| allowed_resources | list | Glob patterns for permitted resources |
+| blocked_resources | list | Glob patterns for blocked resources |
+| max_actions_per_minute | int | Rate limit for agent actions |
+| max_risk_score | float | Hard ceiling on risk score (0-1) |
+| mode | KillSwitchMode | Response when a violation occurs |
 
 ## Pre-execution checks
-```python
-import requests
 
-response = requests.post("https://vaultak.com/api/check",
-    headers={"x-api-key": "vtk_your_api_key_here"},
-    json={
-        "agent_id": "my-agent",
-        "action_type": "file_delete",
-        "resource": "/data/sensitive.csv"
-    }
-)
+    import requests
 
-result = response.json()
-if result["allowed"]:
-    delete_file("/data/sensitive.csv")
-else:
-    print(f"Blocked: {result['reason']}")
-```
+    response = requests.post("https://vaultak.com/api/check",
+        headers={"x-api-key": "vtk_your_api_key_here"},
+        json={
+            "agent_id": "my-agent",
+            "action_type": "file_delete",
+            "resource": "/data/sensitive.csv"
+        }
+    )
+
+    result = response.json()
+    if result["decision"] == "allow":
+        delete_file("/data/sensitive.csv")
+    else:
+        print(f"Blocked: {result['reason']}")
 
 ## Works with any framework
-```python
-# LangChain
-with vt.monitor("langchain-agent"):
-    response = llm.invoke(prompt)
 
-# CrewAI
-with vt.monitor("crew-agent"):
-    crew.kickoff()
+    # LangChain
+    with vt.monitor("langchain-agent"):
+        response = llm.invoke(prompt)
 
-# Custom agents
-with vt.monitor("my-agent"):
-    agent.run()
-```
+    # CrewAI
+    with vt.monitor("crew-agent"):
+        crew.kickoff()
+
+    # Custom agents
+    with vt.monitor("my-agent"):
+        agent.run()
