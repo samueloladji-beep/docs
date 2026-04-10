@@ -1,95 +1,77 @@
 ---
-title: Quickstart
-description: Add runtime security to your AI agent in 5 minutes
+title: Quickstart - Vaultak Core
+description: Add runtime security to your AI agent in 5 minutes with the SDK
 ---
 
-## 1. Install the SDK
+This guide is for developers who want to add Vaultak directly to their agent code. If you want to govern an existing agent without code changes, see the [Vaultak Sentry guide](/sentry).
 
-    pip install vaultak
+## Step 1: Install
 
-## 2. Get your API key
+```bash
+pip install vaultak
+```
 
-Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is shown once on the onboarding screen — save it.
+## Step 2: Get your API key
 
-## 3. Wrap your agent
+Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is shown once on the onboarding screen.
 
-    from vaultak import Vaultak
+## Step 3: Wrap your agent
 
-    vt = Vaultak(api_key="vtk_your_api_key_here")
+```python
+from vaultak import Vaultak
 
-    with vt.monitor("my-agent"):
-        # your agent code here
-        pass
+vt = Vaultak(api_key="vtk_your_api_key_here")
 
-That's it. Every action your agent takes is now monitored, risk-scored, and logged in real time on your dashboard.
+with vt.monitor("my-agent"):
+    # your agent code here
+    pass
+```
 
-## 4. Define what your agent is allowed to do (optional but recommended)
+That is it. Every action your agent takes is now monitored, risk-scored, and logged in real time.
 
-    from vaultak import Vaultak, ActionType, KillSwitchMode
+## Step 4: Define what your agent is allowed to do
 
-    vt = Vaultak(
-        api_key="vtk_your_api_key_here",
-        allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
-        allowed_resources=["/tmp/*", "/data/readonly/*"],
-        blocked_resources=["prod.*", "*.env"],
-        max_actions_per_minute=20,
-        max_risk_score=0.7,
-        mode=KillSwitchMode.PAUSE
-    )
+```python
+from vaultak import Vaultak, ActionType, KillSwitchMode
 
-    with vt.monitor("my-agent"):
-        agent.run()
+vt = Vaultak(
+    api_key="vtk_your_api_key_here",
+    allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
+    allowed_resources=["/tmp/*", "/data/readonly/*"],
+    blocked_resources=["prod.*", "*.env"],
+    max_actions_per_minute=20,
+    max_risk_score=0.7,
+    mode=KillSwitchMode.PAUSE
+)
 
-Any action outside those boundaries is blocked before it executes.
+with vt.monitor("my-agent"):
+    agent.run()
+```
 
-## Response Modes
+## Response modes
 
-| Mode | What happens |
-|------|-------------|
-| ALERT | Logs and notifies. Agent keeps running. Default. |
-| PAUSE | Agent halts. Awaits human approval. |
-| ROLLBACK | Reverses last N actions. Agent pauses. |
-
-## Permission Profile Parameters
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| allowed_action_types | list | Only these action types are permitted |
-| allowed_resources | list | Glob patterns for permitted resources |
-| blocked_resources | list | Glob patterns for blocked resources |
-| max_actions_per_minute | int | Rate limit for agent actions |
-| max_risk_score | float | Hard ceiling on risk score (0-1) |
-| mode | KillSwitchMode | Response when a violation occurs |
-
-## Pre-execution checks
-
-    import requests
-
-    response = requests.post("https://vaultak.com/api/check",
-        headers={"x-api-key": "vtk_your_api_key_here"},
-        json={
-            "agent_id": "my-agent",
-            "action_type": "file_delete",
-            "resource": "/data/sensitive.csv"
-        }
-    )
-
-    result = response.json()
-    if result["decision"] == "allow":
-        delete_file("/data/sensitive.csv")
-    else:
-        print(f"Blocked: {result['reason']}")
+ALERT: Logs and notifies. Agent keeps running. Default.
+PAUSE: Agent halts immediately. Awaits human approval in dashboard.
+ROLLBACK: Reverses last N actions automatically. Agent then pauses.
 
 ## Works with any framework
 
-    # LangChain
-    with vt.monitor("langchain-agent"):
-        response = llm.invoke(prompt)
+```python
+# LangChain
+with vt.monitor("langchain-agent"):
+    response = llm.invoke(prompt)
 
-    # CrewAI
-    with vt.monitor("crew-agent"):
-        crew.kickoff()
+# CrewAI
+with vt.monitor("crew-agent"):
+    crew.kickoff()
 
-    # Custom agents
-    with vt.monitor("my-agent"):
-        agent.run()
+# AutoGen
+with vt.monitor("autogen-agent"):
+    agent.run()
+```
+
+## Next steps
+
+- [View your agents in the dashboard](https://app.vaultak.com)
+- [Read the full API reference](/api-reference)
+- [Learn about Vaultak Sentry for zero-code deployment](/sentry)

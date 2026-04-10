@@ -1,0 +1,189 @@
+---
+title: Quickstart - Vaultak Sentry
+description: Govern any AI agent with zero code changes
+---
+
+Vaultak Sentry monitors any AI agent running on your machine or server without requiring any changes to the agent code. You do not need to be a developer to use it. If you can open a terminal and run a command, you can have full agent governance running in minutes.
+
+## What is Vaultak Sentry?
+
+When an AI agent runs on your systems, it can read files, make network requests, write to databases, and spawn other processes. Without governance, there is no way to know what it is doing or stop it if something goes wrong.
+
+Vaultak Sentry sits alongside the agent process and watches everything it does at the operating system level. It compares every action against a policy you define. If the agent does something it is not authorized to do, Sentry alerts you, pauses the agent, or automatically reverses the damage.
+
+The agent does not know Sentry is there. You do not need to touch the agent code at all.
+
+## Before you start
+
+You need:
+- A terminal application (Terminal on Mac, any terminal on Linux or Windows)
+- Python 3.8 or higher installed
+- A Vaultak account and API key from [app.vaultak.com](https://app.vaultak.com)
+
+## Step 1: Install Vaultak Sentry
+
+```bash
+pip install vaultak-sentry
+```
+
+## Step 2: Connect to your Vaultak account
+
+```bash
+vaultak-sentry auth --api-key vtk_your_api_key_here
+```
+
+Your API key is saved securely on your machine. You only need to do this once.
+
+## Step 3: Check that everything is working
+
+```bash
+vaultak-sentry status
+```
+
+If psutil or watchdog show as missing, run:
+
+```bash
+pip install psutil watchdog
+```
+
+## Step 4: Create a policy for your agent
+
+A policy tells Sentry what your agent is authorized to do. Anything outside the policy is unauthorized.
+
+```bash
+vaultak-sentry policy list
+```
+
+Available templates:
+- data-pipeline: Agents that read and process data files
+- coding-agent: Agents that write and execute code
+- customer-support: Agents that interact with CRM or customer systems
+- research-agent: Agents that browse the web and gather information
+- hipaa-agent: Agents handling healthcare or patient data
+- strict: Maximum restriction for sensitive environments
+
+Create a policy:
+
+```bash
+vaultak-sentry policy create --agent-id my-agent --template data-pipeline
+```
+
+To see what the policy allows and blocks:
+
+```bash
+vaultak-sentry policy show --agent-id my-agent
+```
+
+## Step 5: Run your agent through Sentry
+
+Before Sentry:
+```bash
+python my_agent.py
+```
+
+With Sentry:
+```bash
+vaultak-sentry run --name my-agent python my_agent.py
+```
+
+That is the only change. Works with any language:
+
+```bash
+# Python
+vaultak-sentry run --name my-agent python my_agent.py
+
+# Node.js
+vaultak-sentry run --name my-agent node my_agent.js
+
+# Any executable
+vaultak-sentry run --name my-agent ./my_agent
+```
+
+## Step 6: View your agent in the dashboard
+
+Open [app.vaultak.com](https://app.vaultak.com). You will see your agent listed with every action it has taken, each one risk-scored and logged in real time.
+
+## Attaching to an agent that is already running
+
+First find the process ID:
+
+```bash
+ps aux | grep my_agent.py
+```
+
+Then attach Sentry:
+
+```bash
+vaultak-sentry attach 12345 --name my-agent
+```
+
+Replace 12345 with the actual process ID.
+
+## Response modes
+
+```bash
+# Alert - log violations, agent keeps running (default)
+vaultak-sentry run --mode alert --name my-agent python my_agent.py
+
+# Pause - stop the agent immediately on violation
+vaultak-sentry run --mode pause --name my-agent python my_agent.py
+
+# Rollback - reverse recent actions then stop the agent
+vaultak-sentry run --mode rollback --name my-agent python my_agent.py
+```
+
+## Customizing your policy inline
+
+```bash
+vaultak-sentry run \
+  --name my-agent \
+  --allow "/data/readonly/**" "/tmp/**" \
+  --block "*.env" "prod.*" "*.key" \
+  --allow-hosts "api.openai.com" \
+  --mode pause \
+  python my_agent.py
+```
+
+## Disabling specific monitors
+
+```bash
+vaultak-sentry run --no-net --name my-agent python my_agent.py
+vaultak-sentry run --no-proc --name my-agent python my_agent.py
+vaultak-sentry run --no-fs --name my-agent python my_agent.py
+```
+
+## What Sentry monitors
+
+- File system: Every file your agent reads, writes, or deletes
+- Network: Every connection your agent makes to external servers
+- Processes: Every subprocess your agent spawns
+- CPU: Spikes above 90% that may indicate runaway behavior
+- Memory: Usage above 2GB that may indicate a memory leak or loop
+- Database: Connections to database ports
+
+## Privacy note
+
+Vaultak Sentry monitors that file access, network connections, and process spawning occur. It never reads the contents of files or the values of environment variables. The only data sent to Vaultak servers is the action type, the resource path or hostname, the timestamp, and the risk score.
+
+## Frequently asked questions
+
+**Do I need to be a developer to use Vaultak Sentry?**
+No. If you can open a terminal and type commands, you can use Sentry.
+
+**Will Sentry slow down my agent?**
+No. Sentry runs as a separate process alongside your agent. It does not intercept or delay agent actions. The performance impact is negligible.
+
+**What happens if Sentry loses connection to the Vaultak backend?**
+Sentry continues monitoring locally. Permission profile enforcement continues to work without a network connection.
+
+**Can I use Sentry and Core together?**
+Yes. Both sets of events flow to the same dashboard.
+
+**Does Sentry work on Windows?**
+Yes. Sentry works on Mac, Linux, and Windows.
+
+## Next steps
+
+- [View your agents in the dashboard](https://app.vaultak.com)
+- [Learn about Vaultak Core for SDK integration](/quickstart)
+- [Read the full API reference](/api-reference)

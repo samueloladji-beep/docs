@@ -5,36 +5,50 @@ description: Runtime security for autonomous AI agents
 
 ## What is Vaultak?
 
-Vaultak is a behavioral security layer for AI agents. It monitors every action your agents take in real time, scores risk across five dimensions, and responds automatically — alerting, pausing, or reversing damage before it cascades.
+Vaultak is a runtime security platform for autonomous AI agents. It monitors every action your agents take, enforces the boundaries you define, and automatically responds when something goes wrong.
 
-## Why Vaultak?
+## Two ways to get started
 
-AI agents are being deployed into production systems that touch files, databases, APIs, and external services. Existing security tools protect the perimeter — but nothing governs what happens inside once an agent has access.
+### Vaultak Core
 
-Vaultak fills that gap. No infrastructure required. No sales cycle. Just five lines of code.
+For developers who want deep code-level integration. Add five lines of code to your agent and get full behavioral monitoring, risk scoring, permission profiles, and automatic rollback.
+
+```bash
+pip install vaultak
+```
+
+### Vaultak Sentry
+
+For teams who want to govern existing agents without touching the code. No code changes. Works with any language and any framework.
+
+```bash
+pip install vaultak-sentry
+```
+
+Both products use the same API key and the same dashboard at app.vaultak.com.
 
 ## What makes Vaultak different?
 
-- **Rollback** — automatically reverses the last N agent actions. No other tool does this.
-- **Zero dependencies** — pure Python, drops into any stack in minutes
-- **Developer-first** — pip install vaultak and you're protected
-- **Behavioral baseline learning** — adapts to your agent over time, not just generic rules
-- **Three response modes** — Alert, Pause, and Rollback
-- **Security Policies** — define rules that block or pause risky actions before they execute
-- **Pre-execution checks** — evaluate risk before an action runs via /api/check
-- **Real-time dashboard** — monitor every agent action live at app.vaultak.com
-
-## Install
-
-    pip install vaultak
+- **Zero code changes with Sentry** - govern any agent without modifying it
+- **Automatic rollback** - reverses the last N agent actions on violation. No other tool does this.
+- **Policy compiler** - declare exactly what each agent is authorized to do
+- **Pre-execution enforcement** - actions are blocked before they run, not just logged after
+- **Three response modes** - Alert, Pause, and Rollback
+- **HIPAA and SOC 2 ready** - full audit trail for compliance documentation
 
 ## Get Started
 
 <CardGroup cols={2}>
-  <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Get up and running in 5 minutes
+  <Card title="Quickstart: Core" icon="code" href="/quickstart">
+    Add five lines of code to your agent
   </Card>
-  <Card title="SDK & API Reference" href="/api-reference" icon="code">
-    Full SDK and REST API documentation
+  <Card title="Quickstart: Sentry" icon="shield" href="/sentry">
+    Govern any agent with zero code changes
+  </Card>
+  <Card title="API Reference" icon="book" href="/api-reference">
+    Full REST API documentation
+  </Card>
+  <Card title="Dashboard" icon="chart-bar" href="https://app.vaultak.com">
+    View your agents in real time
   </Card>
 </CardGroup>
