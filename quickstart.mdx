@@ -1,62 +1,66 @@
 ---
 title: Quickstart - Vaultak Core
-description: Add runtime security to your AI agent in 5 minutes with the SDK
+description: Add runtime security to your AI agent in 5 minutes
 ---
-
-This guide is for developers who want to add Vaultak directly to their agent code. If you want to govern an existing agent without code changes, see the [Vaultak Sentry guide](/sentry).
 
 ## Step 1: Install
 
-```bash
+\`\`\`bash
 pip install vaultak
-```
+\`\`\`
 
 ## Step 2: Get your API key
 
-Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is shown once on the onboarding screen.
+Sign up at [app.vaultak.com](https://app.vaultak.com). Your API key is on the API Key tab. It starts with `vtk_`.
 
 ## Step 3: Wrap your agent
 
-```python
+\`\`\`python
 from vaultak import Vaultak
 
 vt = Vaultak(api_key="vtk_your_api_key_here")
 
 with vt.monitor("my-agent"):
-    # your agent code here
-    pass
-```
+    agent.run()
+\`\`\`
 
-That is it. Every action your agent takes is now monitored, risk-scored, and logged in real time.
+Every action your agent takes is now monitored, risk-scored, and logged in real time.
 
-## Step 4: Define what your agent is allowed to do
+## Step 4: Configure thresholds
 
-```python
-from vaultak import Vaultak, ActionType, KillSwitchMode
-
+\`\`\`python
 vt = Vaultak(
     api_key="vtk_your_api_key_here",
-    allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
-    allowed_resources=["/tmp/*", "/data/readonly/*"],
-    blocked_resources=["prod.*", "*.env"],
-    max_actions_per_minute=20,
-    max_risk_score=0.7,
-    mode=KillSwitchMode.PAUSE
+    alert_threshold=30,    # Score >= 30: alert and log
+    pause_threshold=60,    # Score >= 60: halt agent, await review
+    rollback_threshold=85  # Score >= 85: auto-rollback and halt
 )
+\`\`\`
 
-with vt.monitor("my-agent"):
-    agent.run()
-```
+## Step 5: Define what your agent is allowed to do
+
+\`\`\`python
+vt = Vaultak(
+    api_key="vtk_your_api_key_here",
+    allowed_resources=["/tmp/*", "/data/readonly/*"],
+    blocked_resources=["prod.*", "*.env", "*.key"],
+    max_actions_per_minute=20,
+)
+\`\`\`
+
+Policies can also be created and managed in the dashboard — no code changes needed.
 
 ## Response modes
 
-ALERT: Logs and notifies. Agent keeps running. Default.
-PAUSE: Agent halts immediately. Awaits human approval in dashboard.
-ROLLBACK: Reverses last N actions automatically. Agent then pauses.
+| Mode | Trigger | Behavior |
+|------|---------|----------|
+| **Alert** | Score >= 30 | Logs event, sends notification, agent continues |
+| **Pause** | Score >= 60 | Halts agent, queues action for human review |
+| **Rollback** | Score >= 85 | Reverses state using snapshot, halts agent |
 
 ## Works with any framework
 
-```python
+\`\`\`python
 # LangChain
 with vt.monitor("langchain-agent"):
     response = llm.invoke(prompt)
@@ -68,7 +72,17 @@ with vt.monitor("crew-agent"):
 # AutoGen
 with vt.monitor("autogen-agent"):
     agent.run()
-```
+\`\`\`
+
+## Environment variable
+
+\`\`\`bash
+export VAULTAK_API_KEY=vtk_your_api_key_here
+\`\`\`
+
+\`\`\`python
+vt = Vaultak()  # Reads from VAULTAK_API_KEY automatically
+\`\`\`
 
 ## Next steps
 

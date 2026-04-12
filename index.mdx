@@ -5,45 +5,49 @@ description: Runtime security for autonomous AI agents
 
 ## What is Vaultak?
 
-Vaultak is a runtime security platform for autonomous AI agents. It monitors every action your agents take, enforces the boundaries you define, and automatically responds when something goes wrong.
+Vaultak is a runtime security platform for autonomous AI agents. It intercepts every action your agents take, scores risk in real time across five behavioral dimensions, enforces declarative policies, and automatically alerts, pauses, or rolls back agents that exceed your configured thresholds.
 
-## Two ways to get started
+## Two ways to deploy
 
 ### Vaultak Core
 
-For developers who want deep code-level integration. Add five lines of code to your agent and get full behavioral monitoring, risk scoring, permission profiles, and automatic rollback.
+For developers who want deep programmatic integration. Add five lines of code to your agent and get full behavioral monitoring, risk scoring, policy enforcement, and automatic rollback.
 
-```bash
+\`\`\`bash
 pip install vaultak
-```
+\`\`\`
 
 ### Vaultak Sentry
 
-For teams who want to govern existing agents without touching the code. No code changes. Works with any language and any framework.
+A desktop application for macOS, Windows, and Linux. Download it, connect your API key, and any agent running on the machine is immediately monitored — zero code changes required.
 
-```bash
-pip install vaultak-sentry
-```
+[Download Vaultak Sentry →](https://vaultak.com/download)
 
-Both products use the same API key and the same dashboard at app.vaultak.com.
+Both products use the same API key and the same dashboard at [app.vaultak.com](https://app.vaultak.com).
 
-## What makes Vaultak different?
+## What Vaultak provides
 
-- **Zero code changes with Sentry** - govern any agent without modifying it
-- **Automatic rollback** - reverses the last N agent actions on violation. No other tool does this.
-- **Policy compiler** - declare exactly what each agent is authorized to do
-- **Pre-execution enforcement** - actions are blocked before they run, not just logged after
-- **Three response modes** - Alert, Pause, and Rollback
-- **HIPAA and SOC 2 ready** - full audit trail for compliance documentation
+- **Behavioral risk scoring** — every action scored 0-100 across five dimensions
+- **Threshold-based response** — configure Alert, Pause, and Rollback thresholds independently
+- **Automatic rollback** — reverses agent state using stored snapshots
+- **Policy engine** — declare exactly what each agent is authorized to do
+- **Pre-execution enforcement** — actions are blocked before they run, not just logged after
+- **PII masking** — automatically detects and masks PII in all logged events
+- **SIEM integration** — forwards events to Splunk, Datadog, Sentinel, Slack, and PagerDuty
+- **Red team simulation** — simulates 22 adversarial attack vectors before deployment
+- **Shadow AI detection** — detects data flowing to unsanctioned AI services
+- **MCP gateway security** — monitors and enforces policies on MCP connections
+- **On-premises deployment** — full Docker Compose package for air-gapped environments
+- **HIPAA, SOC 2, GDPR, and PCI-DSS ready** — immutable audit trail for compliance
 
 ## Get Started
 
 <CardGroup cols={2}>
-  <Card title="Quickstart: Core" icon="code" href="/quickstart">
+  <Card title="Quickstart: Core SDK" icon="code" href="/quickstart">
     Add five lines of code to your agent
   </Card>
   <Card title="Quickstart: Sentry" icon="shield" href="/sentry">
-    Govern any agent with zero code changes
+    Zero-code desktop app for instant monitoring
   </Card>
   <Card title="API Reference" icon="book" href="/api-reference">
     Full REST API documentation

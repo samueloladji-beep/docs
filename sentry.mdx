@@ -1,189 +1,88 @@
 ---
 title: Quickstart - Vaultak Sentry
-description: Govern any AI agent with zero code changes
+description: Monitor any AI agent with zero code changes using the Vaultak Sentry desktop app
 ---
 
-Vaultak Sentry monitors any AI agent running on your machine or server without requiring any changes to the agent code. You do not need to be a developer to use it. If you can open a terminal and run a command, you can have full agent governance running in minutes.
+Vaultak Sentry is a desktop application for macOS, Windows, and Linux that monitors any AI agent running on your machine without requiring any changes to the agent code. Install it in two minutes and get full behavioral monitoring immediately.
 
-## What is Vaultak Sentry?
+## Download
 
-When an AI agent runs on your systems, it can read files, make network requests, write to databases, and spawn other processes. Without governance, there is no way to know what it is doing or stop it if something goes wrong.
+Download the installer for your platform from [vaultak.com/download](https://vaultak.com/download):
 
-Vaultak Sentry sits alongside the agent process and watches everything it does at the operating system level. It compares every action against a policy you define. If the agent does something it is not authorized to do, Sentry alerts you, pauses the agent, or automatically reverses the damage.
+| Platform | File |
+|----------|------|
+| macOS (Apple Silicon) | `VaultakSentry-1.0.0-arm64.pkg` |
+| Windows | `VaultakSentry-1.0.0-windows.zip` |
+| Linux | `VaultakSentry-1.0.0-linux.tar.gz` |
 
-The agent does not know Sentry is there. You do not need to touch the agent code at all.
+## Installation
 
-## Before you start
+### macOS
 
-You need:
-- A terminal application (Terminal on Mac, any terminal on Linux or Windows)
-- Python 3.8 or higher installed
-- A Vaultak account and API key from [app.vaultak.com](https://app.vaultak.com)
+1. Download `VaultakSentry-1.0.0-arm64.pkg`
+2. **Right-click** the file and select **Open**
+3. Click **Open** in the security dialog
+4. Follow the installer prompts
 
-## Step 1: Install Vaultak Sentry
+### Windows
 
-```bash
-pip install vaultak-sentry
-```
+1. Download `VaultakSentry-1.0.0-windows.zip`
+2. Extract the zip file
+3. Run `VaultakSentry.exe`
+4. If SmartScreen appears, click **More info** then **Run anyway**
 
-## Step 2: Connect to your Vaultak account
+### Linux
 
-```bash
-vaultak-sentry auth --api-key vtk_your_api_key_here
-```
+\`\`\`bash
+tar -xzf VaultakSentry-1.0.0-linux.tar.gz
+cd VaultakSentry-1.0.0
+./VaultakSentry
+\`\`\`
 
-Your API key is saved securely on your machine. You only need to do this once.
+## Connect to your account
 
-## Step 3: Check that everything is working
+1. Open the Vaultak Sentry app
+2. Enter your API key from [app.vaultak.com](https://app.vaultak.com)
+3. Click **Connect**
+4. The status indicator turns green — monitoring has begun
 
-```bash
-vaultak-sentry status
-```
+## Configure thresholds
 
-If psutil or watchdog show as missing, run:
+| Threshold | Default | Behavior |
+|-----------|---------|----------|
+| **Alert** | 30 | Log event and send notification |
+| **Pause** | 60 | Halt agent, queue for human review |
+| **Rollback** | 85 | Auto-reverse state, halt agent |
 
-```bash
-pip install psutil watchdog
-```
-
-## Step 4: Create a policy for your agent
-
-A policy tells Sentry what your agent is authorized to do. Anything outside the policy is unauthorized.
-
-```bash
-vaultak-sentry policy list
-```
-
-Available templates:
-- data-pipeline: Agents that read and process data files
-- coding-agent: Agents that write and execute code
-- customer-support: Agents that interact with CRM or customer systems
-- research-agent: Agents that browse the web and gather information
-- hipaa-agent: Agents handling healthcare or patient data
-- strict: Maximum restriction for sensitive environments
-
-Create a policy:
-
-```bash
-vaultak-sentry policy create --agent-id my-agent --template data-pipeline
-```
-
-To see what the policy allows and blocks:
-
-```bash
-vaultak-sentry policy show --agent-id my-agent
-```
-
-## Step 5: Run your agent through Sentry
-
-Before Sentry:
-```bash
-python my_agent.py
-```
-
-With Sentry:
-```bash
-vaultak-sentry run --name my-agent python my_agent.py
-```
-
-That is the only change. Works with any language:
-
-```bash
-# Python
-vaultak-sentry run --name my-agent python my_agent.py
-
-# Node.js
-vaultak-sentry run --name my-agent node my_agent.js
-
-# Any executable
-vaultak-sentry run --name my-agent ./my_agent
-```
-
-## Step 6: View your agent in the dashboard
-
-Open [app.vaultak.com](https://app.vaultak.com). You will see your agent listed with every action it has taken, each one risk-scored and logged in real time.
-
-## Attaching to an agent that is already running
-
-First find the process ID:
-
-```bash
-ps aux | grep my_agent.py
-```
-
-Then attach Sentry:
-
-```bash
-vaultak-sentry attach 12345 --name my-agent
-```
-
-Replace 12345 with the actual process ID.
-
-## Response modes
-
-```bash
-# Alert - log violations, agent keeps running (default)
-vaultak-sentry run --mode alert --name my-agent python my_agent.py
-
-# Pause - stop the agent immediately on violation
-vaultak-sentry run --mode pause --name my-agent python my_agent.py
-
-# Rollback - reverse recent actions then stop the agent
-vaultak-sentry run --mode rollback --name my-agent python my_agent.py
-```
-
-## Customizing your policy inline
-
-```bash
-vaultak-sentry run \
-  --name my-agent \
-  --allow "/data/readonly/**" "/tmp/**" \
-  --block "*.env" "prod.*" "*.key" \
-  --allow-hosts "api.openai.com" \
-  --mode pause \
-  python my_agent.py
-```
-
-## Disabling specific monitors
-
-```bash
-vaultak-sentry run --no-net --name my-agent python my_agent.py
-vaultak-sentry run --no-proc --name my-agent python my_agent.py
-vaultak-sentry run --no-fs --name my-agent python my_agent.py
-```
+Thresholds can be adjusted at any time without restarting the app.
 
 ## What Sentry monitors
 
-- File system: Every file your agent reads, writes, or deletes
-- Network: Every connection your agent makes to external servers
-- Processes: Every subprocess your agent spawns
-- CPU: Spikes above 90% that may indicate runaway behavior
-- Memory: Usage above 2GB that may indicate a memory leak or loop
-- Database: Connections to database ports
+- **Network connections** — every outbound API call and external service connection
+- **File system** — reads, writes, and deletes by agent processes
+- **LLM API calls** — requests to OpenAI, Anthropic, and other providers
+- **Process activity** — subprocesses spawned by agents
 
-## Privacy note
+## Privacy
 
-Vaultak Sentry monitors that file access, network connections, and process spawning occur. It never reads the contents of files or the values of environment variables. The only data sent to Vaultak servers is the action type, the resource path or hostname, the timestamp, and the risk score.
+Sentry monitors that actions occur — it does not read file contents or environment variable values. Data sent to Vaultak servers: action type, resource path or hostname, timestamp, and risk score only.
 
 ## Frequently asked questions
 
-**Do I need to be a developer to use Vaultak Sentry?**
-No. If you can open a terminal and type commands, you can use Sentry.
+**Do I need to modify my agent code?**
+No. Sentry monitors at the network and OS level.
 
 **Will Sentry slow down my agent?**
-No. Sentry runs as a separate process alongside your agent. It does not intercept or delay agent actions. The performance impact is negligible.
+No. Sentry runs as a separate background process and does not intercept or delay agent actions.
 
-**What happens if Sentry loses connection to the Vaultak backend?**
-Sentry continues monitoring locally. Permission profile enforcement continues to work without a network connection.
+**I see a security warning on macOS. Is this normal?**
+Yes. Right-click the installer and select Open to bypass the Gatekeeper warning. This is standard for apps not yet signed with an Apple Developer certificate.
 
 **Can I use Sentry and Core together?**
-Yes. Both sets of events flow to the same dashboard.
-
-**Does Sentry work on Windows?**
-Yes. Sentry works on Mac, Linux, and Windows.
+Yes. Events from both products appear in the same dashboard.
 
 ## Next steps
 
 - [View your agents in the dashboard](https://app.vaultak.com)
-- [Learn about Vaultak Core for SDK integration](/quickstart)
+- [Learn about the Core SDK for programmatic integration](/quickstart)
 - [Read the full API reference](/api-reference)
