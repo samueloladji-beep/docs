@@ -46,6 +46,41 @@ cd VaultakSentry-1.0.0
 3. Click **Connect**
 4. The status indicator turns green — monitoring has begun
 
+## Run your agent through Sentry
+
+Instead of running your agent directly:
+```bash
+python my_agent.py
+```
+
+Run it through Sentry:
+```bash
+vaultak-sentry run python my_agent.py
+```
+
+That is the only change. Works with any language:
+
+```bash
+# Python
+vaultak-sentry run --name my-agent python my_agent.py
+
+# Node.js
+vaultak-sentry run --name my-agent node my_agent.js
+
+# Any executable
+vaultak-sentry run --name my-agent ./my_agent
+```
+
+With custom thresholds:
+```bash
+vaultak-sentry run --name my-agent --alert-threshold 30 --pause-threshold 60 --rollback-threshold 85 python my_agent.py
+```
+
+Block specific resources:
+```bash
+vaultak-sentry run --name my-agent --block "*.env" "prod.*" python my_agent.py
+```
+
 ## Configure thresholds
 
 | Threshold | Default | Behavior |
