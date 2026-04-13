@@ -26,6 +26,16 @@ with vt.monitor("my-agent"):
 
 Every action your agent takes is now monitored, risk-scored, and logged in real time.
 
+**Node.js:**
+```javascript
+const { Vaultak } = require("vaultak");
+
+const vt = new Vaultak({ apiKey: "vtk_your_api_key_here" });
+vt.monitor("my-agent");
+
+myAgent.run();
+```
+
 ## Step 4: Configure thresholds
 
 \`\`\`python
