@@ -5,22 +5,24 @@ description: Complete Vaultak SDK and REST API documentation, v0.5.0
 
 ## Installation
 
-    pip install vaultak
-
+```
+pip install vaultak
+```
 ## Initialization
 
-    from vaultak import Vaultak, ActionType, KillSwitchMode
+```
+from vaultak import Vaultak, ActionType, KillSwitchMode
 
-    vt = Vaultak(
-        api_key="vtk_your_api_key_here",
-        allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
-        allowed_resources=["/tmp/*", "/data/readonly/*"],
-        blocked_resources=["prod.*", "*.env"],
-        max_actions_per_minute=20,
-        max_risk_score=0.7,
-        mode=KillSwitchMode.PAUSE
-    )
-
+vt = Vaultak(
+    api_key="vtk_your_api_key_here",
+    allowed_action_types=[ActionType.FILE_READ, ActionType.API_CALL],
+    allowed_resources=["/tmp/*", "/data/readonly/*"],
+    blocked_resources=["prod.*", "*.env"],
+    max_actions_per_minute=20,
+    max_risk_score=0.7,
+    mode=KillSwitchMode.PAUSE
+)
+```
 ## Parameters
 
 | Parameter | Type | Default | Description |
@@ -50,28 +52,31 @@ description: Complete Vaultak SDK and REST API documentation, v0.5.0
 
 ## Response Modes
 
-    KillSwitchMode.ALERT     # Log and notify only (default)
-    KillSwitchMode.PAUSE     # Halt agent, await approval
-    KillSwitchMode.ROLLBACK  # Reverse last N actions and pause
-
+```
+KillSwitchMode.ALERT     # Log and notify only (default)
+KillSwitchMode.PAUSE     # Halt agent, await approval
+KillSwitchMode.ROLLBACK  # Reverse last N actions and pause
+```
 ## vt.monitor()
 
 Context manager that wraps your entire agent session.
 
-    with vt.monitor("my-agent"):
-        pass
-
+```
+with vt.monitor("my-agent"):
+    pass
+```
 ## vt.log_action()
 
 Explicitly log a single agent action.
 
-    vt.log_action(
-        agent_id="my-agent",
-        action_type="file_delete",
-        resource="/data/sensitive.csv",
-        payload={"reason": "cleanup"}
-    )
-
+```
+vt.log_action(
+    agent_id="my-agent",
+    action_type="file_delete",
+    resource="/data/sensitive.csv",
+    payload={"reason": "cleanup"}
+)
+```
 ## 5-Dimensional Risk Scoring
 
 Every action is scored across five dimensions:
@@ -88,80 +93,88 @@ Every action is scored across five dimensions:
 
 All endpoints require your API key in the header:
 
-    x-api-key: vtk_your_api_key_here
-
+```
+x-api-key: vtk_your_api_key_here
+```
 ## POST /api/check
 
 Pre-execution risk check. Returns decision before action runs.
 
-    curl -X POST https://vaultak.com/api/check
-      -H "x-api-key: vtk_your_api_key_here"
-      -H "Content-Type: application/json"
-      -d '{"agent_id": "my-agent", "action_type": "file_delete", "resource": "/data/sensitive.csv"}'
-
+```
+curl -X POST https://vaultak.com/api/check
+  -H "x-api-key: vtk_your_api_key_here"
+  -H "Content-Type: application/json"
+  -d '{"agent_id": "my-agent", "action_type": "file_delete", "resource": "/data/sensitive.csv"}'
+```
 Response:
 
-    {
-      "decision": "block",
-      "reason": "Resource '/data/sensitive.csv' is blocked for this agent",
-      "risk_score": 0.91,
-      "risk_breakdown": {...}
-    }
-
+```
+{
+  "decision": "block",
+  "reason": "Resource '/data/sensitive.csv' is blocked for this agent",
+  "risk_score": 0.91,
+  "risk_breakdown": {...}
+}
+```
 ## PATCH /api/agents/{agent_id}/profile
 
 Update an agent's permission profile from the API.
 
-    curl -X PATCH https://vaultak.com/api/agents/my-agent/profile
-      -H "x-api-key: vtk_your_api_key_here"
-      -H "Content-Type: application/json"
-      -d '{
-        "allowed_action_types": ["file_read", "api_call"],
-        "allowed_resources": ["/tmp/*"],
-        "blocked_resources": ["prod.*", "*.env"],
-        "max_actions_per_minute": 20,
-        "max_risk_score": 0.7
-      }'
-
+```
+curl -X PATCH https://vaultak.com/api/agents/my-agent/profile
+  -H "x-api-key: vtk_your_api_key_here"
+  -H "Content-Type: application/json"
+  -d '{
+    "allowed_action_types": ["file_read", "api_call"],
+    "allowed_resources": ["/tmp/*"],
+    "blocked_resources": ["prod.*", "*.env"],
+    "max_actions_per_minute": 20,
+    "max_risk_score": 0.7
+  }'
+```
 ## POST /api/actions
 
 Log a completed agent action.
 
-    curl -X POST https://vaultak.com/api/actions
-      -H "x-api-key: vtk_your_api_key_here"
-      -H "Content-Type: application/json"
-      -d '{"agent_id": "my-agent", "action_type": "file_write", "resource": "/tmp/output.txt"}'
-
+```
+curl -X POST https://vaultak.com/api/actions
+  -H "x-api-key: vtk_your_api_key_here"
+  -H "Content-Type: application/json"
+  -d '{"agent_id": "my-agent", "action_type": "file_write", "resource": "/tmp/output.txt"}'
+```
 ## GET /api/agents
 
 List all registered agents with their permission profiles.
 
-    curl https://vaultak.com/api/agents
-      -H "x-api-key: vtk_your_api_key_here"
-
+```
+curl https://vaultak.com/api/agents
+  -H "x-api-key: vtk_your_api_key_here"
+```
 ## GET /api/alerts
 
 Retrieve active alerts.
 
-    curl https://vaultak.com/api/alerts
-      -H "x-api-key: vtk_your_api_key_here"
-
+```
+curl https://vaultak.com/api/alerts
+  -H "x-api-key: vtk_your_api_key_here"
+```
 ## Security Policies
 
 Policies let you define rules that automatically block, pause, or allow actions.
 
-    curl -X POST https://vaultak.com/api/policies
-      -H "x-api-key: vtk_your_api_key_here"
-      -H "Content-Type: application/json"
-      -d '{
-        "name": "no-prod-deletes",
-        "action_type": "file_delete",
-        "resource_pattern": "prod.*",
-        "effect": "block",
-        "max_risk_score": 0.5,
-        "priority": 10
-      }'
-
+```
+curl -X POST https://vaultak.com/api/policies
+  -H "x-api-key: vtk_your_api_key_here"
+  -H "Content-Type: application/json"
+  -d '{
+    "name": "no-prod-deletes",
+    "action_type": "file_delete",
+    "resource_pattern": "prod.*",
+    "effect": "block",
+    "max_risk_score": 0.5,
+    "priority": 10
+  }'
+```
 | Field | Type | Description |
 |-------|------|-------------|
 | name | str | Human-readable policy name |
